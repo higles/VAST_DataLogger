@@ -108,7 +108,6 @@ void setup()
 #if USBOUT==1
         Serial.println("\r\nCard init. failed!");
 #endif
-//        error(1);
     }
 
     // Store filename in buffer
