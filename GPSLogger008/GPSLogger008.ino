@@ -110,7 +110,7 @@ void setup()
 #endif
     }
 
-    // Store filename in buffer
+    /**Store filename in buffer**//
     strcpy(buffer, "GPSLOG00.txt");
 
     //Increment file name postfix if files arleady exist
