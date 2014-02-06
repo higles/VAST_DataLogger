@@ -1,5 +1,5 @@
 /*************************************************************************
-Mitch Bodmer, Joe Higley, Brandan Nelson, Kendel Gregory, Chase Guyer
+Mitch Bodmer, Joe Higley, Brandan Nelson, Kendall Gregory, Chase Guyer
 GPS Datalogging Sketch
 Version 0.08
 *************************************************************************/
@@ -298,103 +298,87 @@ void AddErrorCode(char code)
   errors[i] = code;
 }
 
-void RunError()
-{
-  if (errors[0])
-  {
-    switch(errors[0])
-    {
+/**  **/
+void RunError() {
+  if (errors[0]) { // if error array has more than 0 elements
+    switch(errors[0]) {
       case LONG_CODE:
-        if (millis() - errorStart >= LONG)
-        {
+        if (millis() - errorStart >= LONG) {
           errorStart = millis();
           digitalWrite(led2Pin, LOW);
           AdvanceArray();
         }
-        else
-        {
+        else {
           digitalWrite(led2Pin, HIGH);
         }
       break;
       
       case SHORT_CODE:
-        if (millis() - errorStart >= SHORT)
-        {
+        if (millis() - errorStart >= SHORT) {
           errorStart = millis();
           digitalWrite(led2Pin, LOW);
           AdvanceArray();
         }
-        else
-        {
+        else {
           digitalWrite(led2Pin, HIGH);
         }
       break;
       
       case BREAK_CODE:
-        if (millis() - errorStart >= BREAK)
-        {
+        if (millis() - errorStart >= BREAK) {
           errorStart = millis();
           AdvanceArray();
           digitalWrite(led2Pin, HIGH);
         }
-        else
-        {
+        else {
           digitalWrite(led2Pin, LOW);
         }
       break;
       
       case ENDBREAK_CODE:
-        if (millis() - errorStart >= ENDBREAK)
-        {
+        if (millis() - errorStart >= ENDBREAK) {
           errorStart = millis();
           AdvanceArray();
           DeleteErrorCode();
           digitalWrite(led2Pin, HIGH);
         }
-        else
-        {
+        else {
           digitalWrite(led2Pin, LOW);
         }
       break;
     }
   }
-  else
-  {
+  else {
     errorStart = millis();
     digitalWrite(led2Pin, HIGH);
   }
 }
 
-void AdvanceArray()
-{
+/** Advancing to the next blink code in long array **/
+void AdvanceArray() {
   int i = 0;
-  while (i < NUM_ERRORS - 1 && errors[i] != 0)
-  {
+  while (i < NUM_ERRORS - 1 && errors[i] != 0) {
     errors[i] = errors[i+1];
     ++i;
   }
   errors[i] = 0;
 }
 
-void PrintErrorArray()
-{
-  for (int i = 0; i < NUM_ERRORS; ++i)
-  {
+/** Prints the blink code to serial for debugging **/
+void PrintErrorArray() {
+  for (int i = 0; i < NUM_ERRORS; ++i) {
     Serial.print((char)(errors[i] + '0'));
     Serial.print(" ");
   }
   Serial.print("\n");
 }
 
-void DeleteErrorCode()
-{
+/** Deletes error off of short list after execution **/
+void DeleteErrorCode() {
   int i = 0;
-  while (i < NUM_ERROR_CODES - 1 && errorList[i] != 0)
-  {
+  while (i < NUM_ERROR_CODES - 1 && errorList[i] != 0) {
     errorList[i] = errorList[i+1];
     ++i;
   }
   errorList[i] = 0;
 }
-
-// poop
