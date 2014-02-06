@@ -1,0 +1,33 @@
+#######################################
+# Syntax Coloring Map for GPS
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+GPS	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	    KEYWORD2
+end	        KEYWORD2
+read	    KEYWORD2
+available	KEYWORD2
+isListening	KEYWORD2
+overflow	KEYWORD2
+flush	    KEYWORD2
+listen	    KEYWORD2
+getcsum	    KEYWORD2
+getfix  	KEYWORD2
+gotstring	KEYWORD2
+turnoff	    KEYWORD2
+turnon	    KEYWORD2
+getstring	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
