@@ -92,21 +92,18 @@ void setup() {
     /**Chip select pin must be output for SD library to function**/
     pinMode(chipselectPin, OUTPUT);
 
-<<<<<<< HEAD
     /**Turn on LED 1 to show system on then turn off**/
     digitalWrite(led2Pin,HIGH);
     
     /**once we have a fix**/
 
     /**Initialize Card**/
-=======
     // Turn on LED 1 to show system on then turn off 
     digitalWrite(led2Pin,HIGH);
     
     
     /** Once we have a fix **/
     /** Initialize Card    **/
->>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
     if (!SD.begin(chipselectPin)) {
       AddError(NO_SD);
      
@@ -249,42 +246,6 @@ void loop() {
     }
     
 }
-
-
-/*****Blink Error Code*****
-| Takes an int            |
-| representing an error   |
-| code and halts the      |
-| sketch while repeatedly |
-| blinking that int.      |
-**************************/
-/*
-void error(uint8_t errno)
-{
-    gps.turnoff();
-
-    if(logfile)
-    {
-        logfile.close();
-    }
-    while(1)
-    {
-        for (i=0; i<errno; i++)
-        {
-            digitalWrite(led2Pin, HIGH);
-            digitalWrite(led2Pin, HIGH);
-            delay(100);
-            digitalWrite(led2Pin, LOW);
-            digitalWrite(led2Pin, LOW);
-            delay(100);
-        }
-        for (; i<10; i++)
-        {
-            delay(200);
-        }
-    }
-}
-*/
 
 /****Read Analog Sensor****
 | Takes an info type and  |
