@@ -91,13 +91,12 @@ void setup() {
     /** Chip select pin must be output for SD library to function **/
     pinMode(chipselectPin, OUTPUT);
 
-    /** Turn on LED 1 to show system on then turn off **/
+    // Turn on LED 1 to show system on then turn off 
     digitalWrite(led2Pin,HIGH);
     
     
     /** Once we have a fix **/
-
-    /** Initialize Card **/
+    /** Initialize Card    **/
     if (!SD.begin(chipselectPin)) {
         AddError(NO_SD);
      
@@ -124,13 +123,13 @@ void setup() {
     /** Check if file was created **/
     if(!logfile) {
         AddError(NO_SD_LOG);
-#if USBOUT==1
+#ifdef USBOUT
         Serial.print("\r\nCouldnt create ");
         Serial.println(buffer);
 #endif
     }
 
-#if USBOUT==1
+#ifdef USBOUT
     Serial.print("\r\nWriting to ");
     Serial.println(buffer);
     Serial.println("\r\nReady!");
@@ -140,7 +139,7 @@ void setup() {
 void loop()
 {
     RunError();
-#if USBOUT==1
+#ifdef USBOUT
     PrintErrorArray();
 #endif
     // Get our string
@@ -150,7 +149,7 @@ void loop()
     if(!gps.gotstring())
     {
       AddError(NO_GPS_LOG);
-#if USBOUT==1
+#ifdef USBOUT
         Serial.println("\r\nNo string!");
 #endif
         logfile.write("$NoStr,,,,,,,,,,,,,,*\r\n");
@@ -160,7 +159,7 @@ void loop()
     /** Check for bad checksum or no fix **/
     else if(*buffer=='\0')
     {
-#if USBOUT==1
+#ifdef USBOUT
         if(gps.getcsum())
         {
             if(gps.getcsum()==1)
@@ -191,7 +190,7 @@ void loop()
     /** Log good data with fix and checksum **/
     else
     {
-#if USBOUT==1
+#ifdef USBOUT
         Serial.print('\n');
         Serial.write((uint8_t *)buffer, strlen(buffer));
 #endif
@@ -231,7 +230,7 @@ void readsensor(char info, uint8_t pin)
     // Read voltage
     int reading=analogRead(pin);
 
-#if USBOUT==1
+#ifdef USBOUT
     // Print data to serial
     Serial.write('~');
     Serial.print(pin);
