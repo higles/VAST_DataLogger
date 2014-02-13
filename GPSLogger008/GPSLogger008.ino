@@ -186,25 +186,21 @@ void loop() {
         Serial.write((uint8_t *)buffer, strlen(buffer));
 #endif
 
-        // Log data
+        /** Log data **/
         logfile.write((uint8_t *)buffer, strlen(buffer));
         logfile.flush();
     }
 
     // LED 1 will be off when fix is aquired
-    if(gps.getfix()) {
-     //   digitalWrite(led2Pin,LOW);
-    }
-    else {
-     AddError(NO_GPS);
-      //   digitalWrite(led2Pin,HIGH);
+    if(!gps.getfix()) {
+        AddError(NO_GPS);
     }
 
     readsensor('T', 0);
     readsensor('T', 1);
     readsensor('P', 2);
     
-    //Continue error for SD problems
+    /** Continue error for SD problems **/
     if (!logfile) {
       AddError(NO_SD_LOG);
     }
@@ -223,7 +219,7 @@ void readsensor(char info, uint8_t pin) {
     int reading=analogRead(pin);
 
 #ifdef USBOUT
-    // Print data to serial
+    /** Print data to serial **/
     Serial.write('~');
     Serial.print(pin);
     Serial.print(info);
@@ -231,7 +227,7 @@ void readsensor(char info, uint8_t pin) {
     Serial.println(reading);
 #endif
 
-    // Log data
+    /** Log data **/
     logfile.write('~');
     logfile.print(pin);
     logfile.print(info);
@@ -239,15 +235,6 @@ void readsensor(char info, uint8_t pin) {
     logfile.println(reading);
     logfile.flush();
 }
-
-/****Read Analog Sensor****
-| Takes a Binary int      |
-| And converts the int    |
-| to a blinking error     |
-|                         |
-|                         |
-**************************/
-
 
 /****Add Error*************
 | Adds codes for light    |
