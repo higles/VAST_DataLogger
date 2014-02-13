@@ -8,25 +8,25 @@ Version 0.08
 #include <SoftwareSerialExt.h>
 #include <GPS.h>
 
-/**Set the GPSbaudrate to the baud rate of the GPS module**/
+/** Set the GPSbaudrate to the baud rate of the GPS module **/
 #define GPSBaudRate 4800
 
-/**Set the StringRate to the rate in seconds that the GPS module sends strings**/
+/** Set the StringRate to the rate in seconds that the GPS module sends strings **/
 #define StringRate 1
 
-/**Define blink times**/
+/** Define blink times **/
 const int LONG = 2800;
 const int SHORT = 800;
 const int BREAK = 800;
 const int ENDBREAK = 2800;
 
-/**Define blink code for error list**/
+/** Define blink code for error list **/
 const char LONG_CODE = 4;
 const char SHORT_CODE = 3;
 const char BREAK_CODE = 2;
 const char ENDBREAK_CODE = 1;
 
-/**Define ErrorCodes**/
+/** Define ErrorCodes **/
 const int NO_SD = 0b010;
 const int NO_SD_LOG = 0b011;
 const int NO_INIT = 0b000;
@@ -35,19 +35,19 @@ const int NO_GPS_LOG = 0b100;
 const int GPS_STOP = 0b110;
 const int CHECKSUM_MISMATCH = 0b111;
 
-/**Define array params**/
+/** Define array params **/
 const int NUM_ERROR_CODES = 8;
 const int NUM_ERRORS = 48;
 
-/**Define arrays**/
+/** Define arrays **/
 char errors[NUM_ERRORS]; //long array
 int errorList[NUM_ERROR_CODES]; //short array
 long unsigned int errorStart = 0; //fill value
 
-/**Turn on or off USB output**/
+/** Turn on or off USB output **/
 #define USBOUT 1
 
-/**Set the pins used**/
+/** Set the pins used **/
 #define powerPin 4
 #define led2Pin 5
 #define chipselectPin 10
@@ -55,7 +55,7 @@ long unsigned int errorStart = 0; //fill value
 #define gpsrxPin 3
 #define offbuttonPin 7
 
-/**Forward Declarations**/
+/** Forward Declarations **/
 void readsensor(char info, uint8_t pin);
 void AddError(int error);
 void RunError();
@@ -63,7 +63,7 @@ void AdvanceArray();
 void PrintErrorArray();
 void DeleteErrorCode();
 
-/**Global Variables**/
+/** Global Variables **/
 uint8_t i;
 File logfile;
 GPS gps(gpstxPin, gpsrxPin, GPSBaudRate, StringRate, powerPin);
@@ -85,22 +85,16 @@ void setup() {
       errorList[i] = 0;
     }
 
-    /**Set pin modes**/
+    /** Set pin modes **/
     pinMode(led2Pin, OUTPUT);
     pinMode(offbuttonPin, INPUT);
 
-    /**Chip select pin must be output for SD library to function**/
+    /** Chip select pin must be output for SD library to function **/
     pinMode(chipselectPin, OUTPUT);
 
-    /**Turn on LED 1 to show system on then turn off**/
+    /** Turn on LED 1 to show system on then turn off **/
     digitalWrite(led2Pin,HIGH);
-    
-    /**once we have a fix**/
-    /**Initialize Card   **/
-    // Turn on LED 1 to show system on then turn off 
-    digitalWrite(led2Pin,HIGH);
-    
-    
+       
     /** Once we have a fix **/
     /** Initialize Card    **/
     if (!SD.begin(chipselectPin)) {
@@ -114,12 +108,12 @@ void setup() {
     // Store filename in buffer
     strcpy(buffer, "GPSLOG00.txt");
 
-    //Increment file name postfix if files arleady exist
+    /** Increment file name postfix if files arleady exist **/
     for (i = 0; i < 100; i++) {
         buffer[6] = '0' + i/10;
         buffer[7] = '0' + i%10;
-        if (! SD.exists(buffer)) {
-            
+        
+        if (! SD.exists(buffer)) {            
             break;
         }
     }
@@ -127,7 +121,7 @@ void setup() {
     // Create file with incremented filename
     logfile = SD.open(buffer, O_CREAT | O_WRITE | O_CREAT | O_EXCL);
 
-    // Check if file was created
+    /** Check if file was created **/
     if(!logfile) {
         AddError(NO_SD_LOG);
 #ifdef USBOUT
@@ -151,7 +145,7 @@ void loop() {
     // Get our string
     gps.getstring(buffer);
 
-    // Check if we were able to read a string
+    /** Check if we were able to read a string **/
     if(!gps.gotstring()) {
         AddError(NO_GPS_LOG);
 #ifdef USBOUT
@@ -184,12 +178,9 @@ void loop() {
         logfile.flush();
     }
 
-    // Log good data with fix and checksum
+    /** Log good data with fix and checksum **/
     else
     {
-       // LED 2 will light up while it is writing
-       // digitalWrite(led2Pin, HIGH);
-
 #ifdef USBOUT
         Serial.print('\n');
         Serial.write((uint8_t *)buffer, strlen(buffer));
@@ -198,8 +189,6 @@ void loop() {
         // Log data
         logfile.write((uint8_t *)buffer, strlen(buffer));
         logfile.flush();
-
-      //  digitalWrite(led2Pin, LOW);
     }
 
     // LED 1 will be off when fix is aquired
