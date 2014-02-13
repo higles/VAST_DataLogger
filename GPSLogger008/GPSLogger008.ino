@@ -8,25 +8,25 @@ Version 0.08
 #include <SoftwareSerialExt.h>
 #include <GPS.h>
 
-/** Set the GPSbaudrate to the baud rate of the GPS module **/
+/**Set the GPSbaudrate to the baud rate of the GPS module**/
 #define GPSBaudRate 4800
 
-/** Set the StringRate to the rate in seconds that the GPS module sends strings **/
+/**Set the StringRate to the rate in seconds that the GPS module sends strings**/
 #define StringRate 1
 
-/** Define blink times **/
+/**Define blink times**/
 const int LONG = 2800;
 const int SHORT = 800;
 const int BREAK = 800;
 const int ENDBREAK = 2800;
 
-/** Define blink code for error list **/
+/**Define blink code for error list**/
 const char LONG_CODE = 4;
 const char SHORT_CODE = 3;
 const char BREAK_CODE = 2;
 const char ENDBREAK_CODE = 1;
 
-/** Define ErrorCodes **/
+/**Define ErrorCodes**/
 const int NO_SD = 0b010;
 const int NO_SD_LOG = 0b011;
 const int NO_INIT = 0b000;
@@ -35,19 +35,19 @@ const int NO_GPS_LOG = 0b100;
 const int GPS_STOP = 0b110;
 const int CHECKSUM_MISMATCH = 0b111;
 
-/** Define array params **/
+/**Define array params**/
 const int NUM_ERROR_CODES = 8;
 const int NUM_ERRORS = 48;
 
-/** Define arrays **/
-char errors[NUM_ERRORS]; // Long array
-int errorList[NUM_ERROR_CODES]; // Short array
-long unsigned int errorStart = 0; // Fill value
+/**Define arrays**/
+char errors[NUM_ERRORS]; //long array
+int errorList[NUM_ERROR_CODES]; //short array
+long unsigned int errorStart = 0; //fill value
 
-/** Turn on or off USB output **/
+/**Turn on or off USB output**/
 #define USBOUT 1
 
-/** Set the pins used **/
+/**Set the pins used**/
 #define powerPin 4
 #define led2Pin 5
 #define chipselectPin 10
@@ -55,7 +55,7 @@ long unsigned int errorStart = 0; // Fill value
 #define gpsrxPin 3
 #define offbuttonPin 7
 
-/** Forward Declarations **/
+/**Forward Declarations**/
 void readsensor(char info, uint8_t pin);
 void AddError(int error);
 void RunError();
@@ -63,16 +63,16 @@ void AdvanceArray();
 void PrintErrorArray();
 void DeleteErrorCode();
 
-/** Global Variables **/
+/**Global Variables**/
 uint8_t i;
 File logfile;
 GPS gps(gpstxPin, gpsrxPin, GPSBaudRate, StringRate, powerPin);
 
-// Buffer must fit NMEA sentence
+//Buffer must fit NMEA sentence
 char buffer[100];
 
 void setup() {
-#ifdef USBOUT
+#if USBOUT==1
     Serial.begin(9600);
     Serial.println("\r\nGPS Log");
 #endif
@@ -80,54 +80,56 @@ void setup() {
     for (int i = 0; i < NUM_ERRORS; ++i) {
       errors[i] = 0;
     }
+    
     for (int i = 0; i < NUM_ERROR_CODES; ++i) {
       errorList[i] = 0;
     }
 
-    /** Set pin modes **/
+    /**Set pin modes**/
     pinMode(led2Pin, OUTPUT);
     pinMode(offbuttonPin, INPUT);
 
-    /** Chip select pin must be output for SD library to function **/
+    /**Chip select pin must be output for SD library to function**/
     pinMode(chipselectPin, OUTPUT);
 
-    /** Turn on LED 1 to show system on then turn off **/
+    /**Turn on LED 1 to show system on then turn off**/
     digitalWrite(led2Pin,HIGH);
     
-    
-    /** Once we have a fix **/
+    /**once we have a fix**/
 
-    /** Initialize Card **/
+    /**Initialize Card**/
     if (!SD.begin(chipselectPin)) {
-        AddError(NO_SD);
+      AddError(NO_SD);
      
-#ifdef USBOUT
+#if USBOUT==1
         Serial.println("\r\nCard init. failed!");
 #endif
     }
 
-    /** Store filename in buffer **/
+    // Store filename in buffer
     strcpy(buffer, "GPSLOG00.txt");
 
-    /** Increment file name postfix if files arleady exist **/
+    //Increment file name postfix if files arleady exist
     for (i = 0; i < 100; i++) {
         buffer[6] = '0' + i/10;
         buffer[7] = '0' + i%10;
-        if (! SD.exists(buffer)) { 
+        if (! SD.exists(buffer)) {
+            
             break;
         }
     }
 
-    /** Create file with incremented filename **/
+    // Create file with incremented filename
     logfile = SD.open(buffer, O_CREAT | O_WRITE | O_CREAT | O_EXCL);
 
-    /** Check if file was created **/
+    // Check if file was created
     if(!logfile) {
-        AddError(NO_SD_LOG);
+      AddError(NO_SD_LOG);
 #if USBOUT==1
         Serial.print("\r\nCouldnt create ");
         Serial.println(buffer);
 #endif
+//        error(2);
     }
 
 #if USBOUT==1
@@ -137,8 +139,7 @@ void setup() {
 #endif
 }
 
-void loop()
-{
+void loop() {
     RunError();
 #if USBOUT==1
     PrintErrorArray();
@@ -147,8 +148,7 @@ void loop()
     gps.getstring(buffer);
 
     // Check if we were able to read a string
-    if(!gps.gotstring())
-    {
+    if(!gps.gotstring()) {
       AddError(NO_GPS_LOG);
 #if USBOUT==1
         Serial.println("\r\nNo string!");
@@ -157,28 +157,23 @@ void loop()
         logfile.flush();
     }
 
-    /** Check for bad checksum or no fix **/
-    else if(*buffer=='\0')
-    {
+    // Check for bad checksum or no fix
+    else if(*buffer=='\0') {
 #if USBOUT==1
-        if(gps.getcsum())
-        {
-            if(gps.getcsum()==1)
-            {
+        if(gps.getcsum()) {
+            if(gps.getcsum()==1) {
 
                 Serial.println("\r\nBad checksum!");
 
             }
-            if(gps.getcsum()==2)
-            {
+            if(gps.getcsum()==2) {
 
                 Serial.println("\r\nNo checksum!");
 
             }
         }
 
-        if(!gps.getfix())
-        {
+        if(!gps.getfix()) {
           AddError(NO_GPS);
             Serial.println("\r\nNo fix!");
 
@@ -188,9 +183,12 @@ void loop()
         logfile.flush();
     }
 
-    /** Log good data with fix and checksum **/
+    // Log good data with fix and checksum
     else
     {
+        // LED 2 will light up while it is writing
+       // digitalWrite(led2Pin, HIGH);
+
 #if USBOUT==1
         Serial.print('\n');
         Serial.write((uint8_t *)buffer, strlen(buffer));
@@ -199,25 +197,65 @@ void loop()
         // Log data
         logfile.write((uint8_t *)buffer, strlen(buffer));
         logfile.flush();
+
+      //  digitalWrite(led2Pin, LOW);
     }
 
-    /** Check for gps fix **/
-    if(!gps.getfix())
-    {
-      // If no fix add to error arrays
-      AddError(NO_GPS);
+    // LED 1 will be off when fix is aquired
+    if(gps.getfix()) {
+     //   digitalWrite(led2Pin,LOW);
+    }
+    else {
+     AddError(NO_GPS);
+      //   digitalWrite(led2Pin,HIGH);
     }
 
     readsensor('T', 0);
     readsensor('T', 1);
     readsensor('P', 2);
     
-    /** Continue error for SD problems **/
-    if (!logfile)
-    {
+    //Continue error for SD problems
+    if (!logfile) {
       AddError(NO_SD_LOG);
-    }   
+    }
+    
 }
+
+
+/*****Blink Error Code*****
+| Takes an int            |
+| representing an error   |
+| code and halts the      |
+| sketch while repeatedly |
+| blinking that int.      |
+**************************/
+/*
+void error(uint8_t errno)
+{
+    gps.turnoff();
+
+    if(logfile)
+    {
+        logfile.close();
+    }
+    while(1)
+    {
+        for (i=0; i<errno; i++)
+        {
+            digitalWrite(led2Pin, HIGH);
+            digitalWrite(led2Pin, HIGH);
+            delay(100);
+            digitalWrite(led2Pin, LOW);
+            digitalWrite(led2Pin, LOW);
+            delay(100);
+        }
+        for (; i<10; i++)
+        {
+            delay(200);
+        }
+    }
+}
+*/
 
 /****Read Analog Sensor****
 | Takes an info type and  |
@@ -226,8 +264,7 @@ void loop()
 | correct format to the   |
 | SD card.                |
 **************************/
-void readsensor(char info, uint8_t pin)
-{
+void readsensor(char info, uint8_t pin) {
     // Read voltage
     int reading=analogRead(pin);
 
@@ -263,24 +300,19 @@ void readsensor(char info, uint8_t pin)
 | to errors[]             |
 **************************/
 
-void AddError(int error)
-{
+void AddError(int error) {
   int i = 0;
-  while (i < NUM_ERROR_CODES && errorList[i] != 0) 
-  {
+  while (i < NUM_ERROR_CODES && errorList[i] != 0) {
     if (errorList[i] == error)
       return;
     ++i;
   }
   errorList[i] = error;
-  for (int power = 4; power >= 1; power/=2)
-  {
-    if (power & error)
-    {
+  for (int power = 4; power >= 1; power/=2) {
+    if (power & error) {
       AddErrorCode(LONG_CODE);
     }
-    else
-    {
+    else {
       AddErrorCode(SHORT_CODE);
     }
     if (power != 1) AddErrorCode(BREAK_CODE);
@@ -288,11 +320,9 @@ void AddError(int error)
   AddErrorCode(ENDBREAK_CODE);
 }
 
-void AddErrorCode(char code)
-{
+void AddErrorCode(char code) {
   int i = 0;
-  while (errors[i] != 0 && i < NUM_ERRORS)
-  {
+  while (errors[i] != 0 && i < NUM_ERRORS) {
     ++i;
   }
   errors[i] = code;
