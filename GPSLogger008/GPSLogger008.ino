@@ -92,12 +92,21 @@ void setup() {
     /**Chip select pin must be output for SD library to function**/
     pinMode(chipselectPin, OUTPUT);
 
+<<<<<<< HEAD
     /**Turn on LED 1 to show system on then turn off**/
     digitalWrite(led2Pin,HIGH);
     
     /**once we have a fix**/
 
     /**Initialize Card**/
+=======
+    // Turn on LED 1 to show system on then turn off 
+    digitalWrite(led2Pin,HIGH);
+    
+    
+    /** Once we have a fix **/
+    /** Initialize Card    **/
+>>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
     if (!SD.begin(chipselectPin)) {
       AddError(NO_SD);
      
@@ -124,15 +133,20 @@ void setup() {
 
     // Check if file was created
     if(!logfile) {
+<<<<<<< HEAD
       AddError(NO_SD_LOG);
 #if USBOUT==1
+=======
+        AddError(NO_SD_LOG);
+#ifdef USBOUT
+>>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
         Serial.print("\r\nCouldnt create ");
         Serial.println(buffer);
 #endif
 //        error(2);
     }
 
-#if USBOUT==1
+#ifdef USBOUT
     Serial.print("\r\nWriting to ");
     Serial.println(buffer);
     Serial.println("\r\nReady!");
@@ -141,7 +155,7 @@ void setup() {
 
 void loop() {
     RunError();
-#if USBOUT==1
+#ifdef USBOUT
     PrintErrorArray();
 #endif
     // Get our string
@@ -150,18 +164,29 @@ void loop() {
     // Check if we were able to read a string
     if(!gps.gotstring()) {
       AddError(NO_GPS_LOG);
-#if USBOUT==1
+#ifdef USBOUT
         Serial.println("\r\nNo string!");
 #endif
         logfile.write("$NoStr,,,,,,,,,,,,,,*\r\n");
         logfile.flush();
     }
 
+<<<<<<< HEAD
     // Check for bad checksum or no fix
     else if(*buffer=='\0') {
 #if USBOUT==1
         if(gps.getcsum()) {
             if(gps.getcsum()==1) {
+=======
+    /** Check for bad checksum or no fix **/
+    else if(*buffer=='\0')
+    {
+#ifdef USBOUT
+        if(gps.getcsum())
+        {
+            if(gps.getcsum()==1)
+            {
+>>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
 
                 Serial.println("\r\nBad checksum!");
 
@@ -186,10 +211,14 @@ void loop() {
     // Log good data with fix and checksum
     else
     {
+<<<<<<< HEAD
         // LED 2 will light up while it is writing
        // digitalWrite(led2Pin, HIGH);
 
 #if USBOUT==1
+=======
+#ifdef USBOUT
+>>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
         Serial.print('\n');
         Serial.write((uint8_t *)buffer, strlen(buffer));
 #endif
@@ -268,7 +297,7 @@ void readsensor(char info, uint8_t pin) {
     // Read voltage
     int reading=analogRead(pin);
 
-#if USBOUT==1
+#ifdef USBOUT
     // Print data to serial
     Serial.write('~');
     Serial.print(pin);
