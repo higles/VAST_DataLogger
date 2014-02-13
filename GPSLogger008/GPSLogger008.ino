@@ -72,7 +72,7 @@ GPS gps(gpstxPin, gpsrxPin, GPSBaudRate, StringRate, powerPin);
 char buffer[100];
 
 void setup() {
-#if USBOUT==1
+#ifdef USBOUT
     Serial.begin(9600);
     Serial.println("\r\nGPS Log");
 #endif
@@ -96,8 +96,7 @@ void setup() {
     digitalWrite(led2Pin,HIGH);
     
     /**once we have a fix**/
-
-    /**Initialize Card**/
+    /**Initialize Card   **/
     // Turn on LED 1 to show system on then turn off 
     digitalWrite(led2Pin,HIGH);
     
@@ -107,7 +106,7 @@ void setup() {
     if (!SD.begin(chipselectPin)) {
       AddError(NO_SD);
      
-#if USBOUT==1
+#ifdef USBOUT
         Serial.println("\r\nCard init. failed!");
 #endif
     }
@@ -130,17 +129,11 @@ void setup() {
 
     // Check if file was created
     if(!logfile) {
-<<<<<<< HEAD
-      AddError(NO_SD_LOG);
-#if USBOUT==1
-=======
         AddError(NO_SD_LOG);
 #ifdef USBOUT
->>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
         Serial.print("\r\nCouldnt create ");
         Serial.println(buffer);
 #endif
-//        error(2);
     }
 
 #ifdef USBOUT
@@ -160,7 +153,7 @@ void loop() {
 
     // Check if we were able to read a string
     if(!gps.gotstring()) {
-      AddError(NO_GPS_LOG);
+        AddError(NO_GPS_LOG);
 #ifdef USBOUT
         Serial.println("\r\nNo string!");
 #endif
@@ -168,13 +161,11 @@ void loop() {
         logfile.flush();
     }
 
-<<<<<<< HEAD
     // Check for bad checksum or no fix
     else if(*buffer=='\0') {
 #if USBOUT==1
         if(gps.getcsum()) {
             if(gps.getcsum()==1) {
-=======
     /** Check for bad checksum or no fix **/
     else if(*buffer=='\0')
     {
