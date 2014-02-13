@@ -161,28 +161,16 @@ void loop() {
         logfile.flush();
     }
 
-    // Check for bad checksum or no fix
+    /** Check for bad checksum or no fix **/
     else if(*buffer=='\0') {
-#if USBOUT==1
+#ifdef USBOUT
         if(gps.getcsum()) {
             if(gps.getcsum()==1) {
-    /** Check for bad checksum or no fix **/
-    else if(*buffer=='\0')
-    {
-#ifdef USBOUT
-        if(gps.getcsum())
-        {
-            if(gps.getcsum()==1)
-            {
->>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
-
                 Serial.println("\r\nBad checksum!");
-
             }
+            
             if(gps.getcsum()==2) {
-
                 Serial.println("\r\nNo checksum!");
-
             }
         }
 
@@ -199,14 +187,10 @@ void loop() {
     // Log good data with fix and checksum
     else
     {
-<<<<<<< HEAD
-        // LED 2 will light up while it is writing
+       // LED 2 will light up while it is writing
        // digitalWrite(led2Pin, HIGH);
 
-#if USBOUT==1
-=======
 #ifdef USBOUT
->>>>>>> 9bd0df19eb021e4d10340d5722dba81097fc9a18
         Serial.print('\n');
         Serial.write((uint8_t *)buffer, strlen(buffer));
 #endif
