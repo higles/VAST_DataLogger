@@ -273,6 +273,12 @@ void AddError(int error) {
   AddErrorCode(ENDBREAK_CODE); //long off at end of blink sequence
 }
 
+/************************|
+| Add blink codes 1-4 to |
+| errors[] to determine  |
+| if the light should be |
+| on or off              |
+|************************/
 void AddErrorCode(char code) {
   int i = 0;
   while (errors[i] != 0 && i < NUM_ERRORS) {
@@ -281,11 +287,17 @@ void AddErrorCode(char code) {
   errors[i] = code;
 }
 
-/**  **/
+/***********************|
+| Checks the life of a  |
+| blink and switches to |
+| next blink when it's  |
+| life has ended        |
+|***********************/
 void RunError() {
   if (errors[0]) { // if error array has more than 0 elements
     switch(errors[0]) {
       case LONG_CODE:
+      /** check if blink time is done **/
         if (millis() - errorStart >= LONG) {
           errorStart = millis();
           digitalWrite(led2Pin, LOW);
@@ -297,6 +309,7 @@ void RunError() {
       break;
       
       case SHORT_CODE:
+      /** check if blink time is done **/
         if (millis() - errorStart >= SHORT) {
           errorStart = millis();
           digitalWrite(led2Pin, LOW);
@@ -308,6 +321,7 @@ void RunError() {
       break;
       
       case BREAK_CODE:
+      /** check if blink time is done **/
         if (millis() - errorStart >= BREAK) {
           errorStart = millis();
           AdvanceArray();
@@ -319,6 +333,7 @@ void RunError() {
       break;
       
       case ENDBREAK_CODE:
+      /** check if blink time is done **/
         if (millis() - errorStart >= ENDBREAK) {
           errorStart = millis();
           AdvanceArray();
@@ -337,7 +352,10 @@ void RunError() {
   }
 }
 
-/** Advancing to the next blink code in long array **/
+/************************| 
+| Advancing to the next  |
+| blink code in errors[] | 
+|************************/
 void AdvanceArray() {
   int i = 0;
   while (i < NUM_ERRORS - 1 && errors[i] != 0) {
@@ -356,7 +374,11 @@ void PrintErrorArray() {
   Serial.print("\n");
 }
 
-/** Deletes error off of short list after execution **/
+/*************************|
+| Deletes error off of    |
+| short list after        |
+| execution               |
+|*************************/
 void DeleteErrorCode() {
   int i = 0;
   while (i < NUM_ERROR_CODES - 1 && errorList[i] != 0) {
