@@ -76,11 +76,13 @@ void setup() {
     Serial.begin(9600);
     Serial.println("\r\nGPS Log");
 #endif
-
+    
+    //Initialize blink array to 0's
     for (int i = 0; i < NUM_ERRORS; ++i) {
       errors[i] = 0;
     }
     
+    //Initialize error array to 0's
     for (int i = 0; i < NUM_ERROR_CODES; ++i) {
       errorList[i] = 0;
     }
@@ -130,6 +132,7 @@ void setup() {
 #endif
     }
 
+    //if file was created
 #ifdef USBOUT
     Serial.print("\r\nWriting to ");
     Serial.println(buffer);
@@ -138,9 +141,10 @@ void setup() {
 }
 
 void loop() {
-    RunError();
+    RunError(); //start error blink at start of loop
+    
 #ifdef USBOUT
-    PrintErrorArray();
+    PrintErrorArray(); //only for debugging
 #endif
     // Get our string
     gps.getstring(buffer);
@@ -237,28 +241,36 @@ void readsensor(char info, uint8_t pin) {
 }
 
 /****Add Error*************
-| Adds codes for light    |
-| to errors[]             |
+| Adds error codes for    |
+| light to errorList[]    |
+| in a queue format       |
 **************************/
 
 void AddError(int error) {
   int i = 0;
+  
+  /** Check if error is already in queue **/
   while (i < NUM_ERROR_CODES && errorList[i] != 0) {
     if (errorList[i] == error)
       return;
     ++i;
   }
+  
+  //add the error to the queue
   errorList[i] = error;
+  
+  /** Convert and add error to blink codes in errors[] **/
   for (int power = 4; power >= 1; power/=2) {
-    if (power & error) {
+    if (power & error) { //if binary digit is a 1
       AddErrorCode(LONG_CODE);
     }
-    else {
+    else { //if binary digit is a 0
       AddErrorCode(SHORT_CODE);
     }
+    //short off between each on
     if (power != 1) AddErrorCode(BREAK_CODE);
   }
-  AddErrorCode(ENDBREAK_CODE);
+  AddErrorCode(ENDBREAK_CODE); //long off at end of blink sequence
 }
 
 void AddErrorCode(char code) {
