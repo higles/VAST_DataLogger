@@ -374,11 +374,11 @@ void PrintErrorArray() {
   Serial.print("\n");
 }
 
-/*************************|
-| Deletes error off of    |
-| short list after        |
-| execution               |
-|*************************/
+/**********************|
+| Deletes error off of |
+| errorList[] after    |
+| execution            |
+|**********************/
 void DeleteErrorCode() {
   int i = 0;
   while (i < NUM_ERROR_CODES - 1 && errorList[i] != 0) {
