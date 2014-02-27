@@ -71,6 +71,14 @@ GPS gps(gpstxPin, gpsrxPin, GPSBaudRate, StringRate, powerPin);
 //Buffer must fit NMEA sentence
 char buffer[100];
 
+double PressureConversion(int volts) {
+	return (((volts / 1024)*5)/0.3)*6.89475729;
+}
+
+double TemperatureConversion(int volts) {
+	return ((volts * (5.0 / 1024)) - 1.375) / 0.0225;
+}
+
 void setup() {
 #ifdef USBOUT
     Serial.begin(9600);
@@ -194,15 +202,15 @@ void loop() {
         logfile.write((uint8_t *)buffer, strlen(buffer));
         logfile.flush();
     }
-
-    // LED 1 will be off when fix is aquired
+	
     if(!gps.getfix()) {
         AddError(NO_GPS);
     }
 
-    readsensor('T', 0);
-    readsensor('T', 1);
-    readsensor('P', 2);
+    ReadSensor('T', 0);
+    ReadSensor('T', 1);
+    ReadSensor('P', 2);
+	logfile.write('\n');
     
     /** Continue error for SD problems **/
     if (!logfile) {
@@ -218,26 +226,29 @@ void loop() {
 | correct format to the   |
 | SD card.                |
 **************************/
-void readsensor(char info, uint8_t pin) {
+void ReadSensor(char info, uint8_t pin) {
     // Read voltage
     int reading=analogRead(pin);
 
 #ifdef USBOUT
     /** Print data to serial **/
-    Serial.write('~');
-    Serial.print(pin);
-    Serial.print(info);
-    Serial.write(':');
-    Serial.println(reading);
+    Serial.write(',');
+    Serial.print(result);
 #endif
 
     /** Log data **/
-    logfile.write('~');
-    logfile.print(pin);
-    logfile.print(info);
-    logfile.write(':');
-    logfile.println(reading);
-    logfile.flush();
+	double result = 0;
+	if (info == 'T') {
+		result = TemperatureConversion(reading);
+	}
+	else if (info == 'P') {
+		result = PressureConversion(reading);
+	}
+	else {
+		result = reading;
+	}
+    logfile.write(',');
+	logfile.print(result);
 }
 
 /****Add Error*************
