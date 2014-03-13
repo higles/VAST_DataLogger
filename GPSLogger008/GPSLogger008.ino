@@ -247,13 +247,13 @@ void ReadSensor(char info, uint8_t pin) {
 	else {
 		result = reading;
 	}
-	logfile.write(',');
 	logfile.write(info);
 	logfile.print(pin);
     logfile.write(',');
 	logfile.print(result);
 	logfile.write(',');
 	logfile.print(reading);
+	logfile.write(',');
 }
 
 /****Add Error*************
