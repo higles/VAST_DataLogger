@@ -255,6 +255,7 @@ void ReadSensor(char info, uint8_t pin) {
 	logfile.print(result);
 	logfile.write(',');
 	logfile.print(reading);
+	logfile.write(',');
 }
 
 /****Add Error*************
