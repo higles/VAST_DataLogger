@@ -230,12 +230,6 @@ void ReadSensor(char info, uint8_t pin) {
     // Read voltage
     int reading=analogRead(pin);
 
-#ifdef USBOUT
-    /** Print data to serial **/
-    Serial.write(',');
-    Serial.print(result);
-#endif
-
     /** Log data **/
 	double result = 0;
 	if (info == 'T') {
@@ -247,6 +241,13 @@ void ReadSensor(char info, uint8_t pin) {
 	else {
 		result = reading;
 	}
+
+#ifdef USBOUT
+    /** Print data to serial **/
+    Serial.write(',');
+    Serial.print(result);
+#endif
+
 	logfile.write(',');
 	logfile.write(info);
 	logfile.print(pin);
